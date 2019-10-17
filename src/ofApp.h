@@ -5,6 +5,37 @@
 #include "VProjClass.h"
 #include "ofxCvHaarFinder.h"
 
+class HaarFinderThread : public ofThread {
+public:
+    void setup(int w, int h) {
+        isFrameNew = false;
+        image.allocate(w, h);
+        finder.setup("haarcascade_frontalface_default.xml");
+    }
+    void threadedFunction() {
+
+
+        while(isThreadRunning()) {
+            if (isFrameNew) {
+                finder.blobs.clear();
+                finder.findHaarObjects(image);
+                lock();
+                blobs = finder.blobs;
+                unlock();
+                isFrameNew = false;
+            }
+        }
+
+        // done
+    }
+    
+    bool isFrameNew;
+    ofxCvHaarFinder finder;
+    ofxCvGrayscaleImage image;
+    std::vector<ofxCvBlob> blobs;
+
+};
+
 class ofApp
 	: public ofBaseApp
 {
@@ -35,19 +66,24 @@ public:
 	std::vector<ofRectangle> srcAreas;
 	int areaMode;
 	std::string areaName;
-        ofVideoPlayer test;
-        /* VProjClass vp[2]; */
-        int count;
-        vector <VProjClass> vp;
-        string str;
-        /* VProjClass vp1; */
-        /* ofVideoPlayer test2; */
-        ofxCvColorImage color;
-        ofxCvGrayscaleImage gray;
-        ofxCvHaarFinder finder;
-        ofVideoGrabber vidGrabber;
-        vector < string > linesOfTheFile;
-        int camWidth;
-        int camHeight;
+    ofVideoPlayer test;
+    /* VProjClass vp[2]; */
+    int count;
+    vector <VProjClass *> vp;
+    string str;
+    /* VProjClass vp1; */
+    /* ofVideoPlayer test2; */
+    ofxCvColorImage color;
+    ofxCvGrayscaleImage gray;
+    ofxCvHaarFinder finder;
+    ofVideoGrabber vidGrabber;
+    vector < string > linesOfTheFile;
+    int camWidth;
+    int camHeight;
+    
+    /*-- threaded finder --*/
+    
+    HaarFinderThread threadedFinder;
+    std::vector<ofxCvBlob> receivedBlobs;
 };
 
