@@ -46,6 +46,7 @@ public:
         ofxCvGrayscaleImage gray;
         ofxCvHaarFinder finder;
         ofVideoGrabber vidGrabber;
+        vector < string > linesOfTheFile;
         int camWidth;
         int camHeight;
 };

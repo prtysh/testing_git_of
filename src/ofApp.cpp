@@ -4,13 +4,18 @@
 void ofApp::setup()
 {
     
-    ofToggleFullscreen();
+    /* ofToggleFullscreen(); */
     
     camWidth = 480;  // try to grab at this size.
     camHeight = 360;
 
     //get back a list of devices.
     vector<ofVideoDevice> devices = vidGrabber.listDevices();
+    ofBuffer buffer = ofBufferFromFile("CLIPS/allmp4.txt");
+    for (auto line : buffer.getLines()){
+        linesOfTheFile.push_back(line);
+    }
+
 
     for(size_t i = 0; i < devices.size(); i++){
         if(devices[i].bAvailable){
@@ -40,13 +45,16 @@ void ofApp::setup()
             /* vp.back().vid.load("output.mp4"); */
             /* vp.back().vid.setLoopState(OF_LOOP_NORMAL); */
             /* vp.back().vid.play(); */
-            string lala = "output";
-            lala.append(to_string(count));
-            lala.append(".mp4");
-
+            /* string lala = "output"; */
+            /* lala.append(to_string(count)); */
+            /* lala.append(".mp4"); */
+            string lala = "CLIPS/";
+            lala.append(linesOfTheFile[count]);
+            cout << "it is me " << lala << endl;
             vp[count].vid.load(lala);
             vp[count].vid.setLoopState(OF_LOOP_NORMAL);
             vp[count].vid.play();
+            vp[count].change = (int)ofRandom(5,10);
 
             string temp = str;
             temp.append(to_string(count));
@@ -114,6 +122,17 @@ void ofApp::update()
     ofBackground(100, 100, 100);    
     vidGrabber.update();
 
+    /* cout<< "timer "<< (int)ofGetElapsedTimef() << endl; */
+
+    for(count = 0; count < vp.size(); count++) {
+        if(vp[count].change < (int)ofGetElapsedTimef()){
+            vp[count].vid.close();
+            string clip = "CLIPS/";
+            vp[count].vid.load(clip.append(linesOfTheFile[(int)ofRandom(0,10000)]));
+            vp[count].vid.play();
+            vp[count].change += vp[count].change;
+        }
+    }
     if(vidGrabber.isFrameNew()){
         color.setFromPixels(vidGrabber.getPixels());
         gray = color ;

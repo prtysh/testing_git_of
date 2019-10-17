@@ -15,5 +15,6 @@ class VProjClass{
         std::shared_ptr<ofxWarp::WarpBase> warp;
         ofRectangle bounds;
         string s;
+        int change;
 };
 
